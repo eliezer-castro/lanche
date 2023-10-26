@@ -139,15 +139,16 @@
   main {
     text-align: center;
     padding: 1em;
-
-    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .column {
     gap: 8px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
+    /* width: 100%; */
   }
 
   .save-file {

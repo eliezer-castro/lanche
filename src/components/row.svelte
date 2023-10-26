@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    width: 100%;
+    /* width: 100%; */
   }
 
   .row > * {

@@ -1,5 +1,7 @@
 <!-- SelectedItems.svelte -->
 <script lang="ts">
+  import PixIcon from "./icons/pix-icon.svelte";
+
   export let items = [];
   export let removeItem;
 
@@ -15,6 +17,14 @@
     }
     item.details[index] = event.target.value;
   }
+
+  const pixKeyTypes = [
+    "CPF",
+    "CNPJ",
+    "E-mail",
+    "Telefone",
+    "EVP (Chave aleatória)",
+  ];
 </script>
 
 <div class="selected-items">
@@ -51,6 +61,7 @@
         {/each}
       </div>
     {/each}
+
     <div class="total row">
       <div>Total de itens: {totalCount}</div>
       <div>Valor total: R$ {totalValue.toFixed(2)}</div>
@@ -62,7 +73,7 @@
   .selected-items {
     padding: 20px;
 
-    max-width: 500px;
+    width: 500px;
     border: 1px solid #ddd;
     border-radius: 6px;
   }
@@ -135,7 +146,7 @@
     display: flex;
   }
 
-  .detail-input input {
+  input {
     font-size: 12px;
     height: 32px;
     padding: 4px 12px;
