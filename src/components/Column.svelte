@@ -1,17 +1,17 @@
-<div class="row">
+<div class="column">
   <slot />
 </div>
 
 <style>
-  .row {
+  .column {
     gap: 16px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
     width: 100%;
   }
 
-  .row > * {
+  .column > * {
     flex: 1;
   }
 </style>

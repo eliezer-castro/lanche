@@ -8,6 +8,13 @@
     0
   );
   $: totalCount = items.reduce((sum, item) => sum + item.count, 0);
+
+  function handleDetailChange(event, item, index) {
+    if (!item.details) {
+      item.details = [];
+    }
+    item.details[index] = event.target.value;
+  }
 </script>
 
 <div class="selected-items">
@@ -33,6 +40,15 @@
             >
           </div>
         </div>
+        {#each Array(item.count).fill(0) as _, index}
+          <div class="detail-input">
+            <input
+              value={(item.details && item.details[index]) || ""}
+              on:input={(e) => handleDetailChange(e, item, index)}
+              placeholder="Solicitante"
+            />
+          </div>
+        {/each}
       </div>
     {/each}
     <div class="total row">
@@ -69,6 +85,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     justify-content: space-between;
   }
   .column {
@@ -111,5 +128,22 @@
     border-top: 1px solid #eee;
     padding-top: 8px;
     font-weight: 500;
+  }
+
+  .detail-input {
+    margin-top: 6px;
+    display: flex;
+  }
+
+  .detail-input input {
+    font-size: 12px;
+    height: 32px;
+    padding: 4px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 300px;
+  }
+  input:focus {
+    border: 1px solid #4f44e0;
   }
 </style>

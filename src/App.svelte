@@ -1,6 +1,7 @@
 <script lang="ts">
   import Card from "./components/product-card.svelte";
   import Row from "./components/row.svelte";
+  import Column from "./components/Column.svelte";
   import SelectedItems from "./components/SelectedItems.svelte";
   import waterMedium from "./components/icons/water-medium-icon.svelte";
   import waterLoss from "./components/icons/water-loss-icon.svelte";
@@ -45,7 +46,7 @@
 
       // Criar um link para baixar a imagem
       let link = document.createElement("a");
-      link.download = "selected-items.png";
+      link.download = "listaPedidos.png";
       link.href = imgURL;
       link.click();
     }
@@ -60,67 +61,75 @@
 
 <main>
   <Row>
-    <Card
-      name="Açaí P"
-      price="R$ 3,00"
-      size="pequeno"
-      IconComponent={waterLoss}
-      on:addToCart={() =>
-        addToCart({ name: "Açaí P", price: "R$ 3,00", size: "pequeno" })}
-    />
-    <Card
-      name="Açaí M"
-      price="R$ 4,00"
-      size="Médio"
-      IconComponent={waterMedium}
-      on:addToCart={() =>
-        addToCart({ name: "Açaí M", price: "R$ 4,00", size: "pequeno" })}
-    />
-    <Card
-      name="Açaí G"
-      price="R$ 5,00"
-      size="Grande"
-      IconComponent={waterFull}
-      on:addToCart={() =>
-        addToCart({ name: "Açaí G", price: "R$ 5,00", size: "pequeno" })}
-    />
-    <Card
-      name="Pastel de Carne"
-      price="R$ 2,00"
-      size="Grande"
-      IconComponent={pastel}
-      on:addToCart={() =>
-        addToCart({
-          name: "Pastel de Carne",
-          price: "R$ 2,00",
-          size: "pequeno",
-        })}
-    />
-    <Card
-      name="Pastel de Frango"
-      price="R$ 2,00"
-      size="Grande"
-      IconComponent={pastel}
-      on:addToCart={() =>
-        addToCart({
-          name: "Pastel de Frango",
-          price: "R$ 2,00",
-          size: "pequeno",
-        })}
-    />
-    <Card
-      name="Misto"
-      price="R$ 2,00"
-      size="Grande"
-      IconComponent={pastel}
-      on:addToCart={() =>
-        addToCart({ name: "Misto", price: "R$ 2,00", size: "pequeno" })}
-    />
+    <Column>
+      <Row>
+        <Card
+          name="Açaí P"
+          price="R$ 3,00"
+          size="pequeno"
+          IconComponent={waterLoss}
+          on:addToCart={() =>
+            addToCart({ name: "Açaí P", price: "R$ 3,00", size: "pequeno" })}
+        />
+        <Card
+          name="Açaí M"
+          price="R$ 4,00"
+          size="Médio"
+          IconComponent={waterMedium}
+          on:addToCart={() =>
+            addToCart({ name: "Açaí M", price: "R$ 4,00", size: "pequeno" })}
+        />
+        <Card
+          name="Açaí G"
+          price="R$ 5,00"
+          size="Grande"
+          IconComponent={waterFull}
+          on:addToCart={() =>
+            addToCart({ name: "Açaí G", price: "R$ 5,00", size: "pequeno" })}
+        />
+      </Row>
+      <Row>
+        <Card
+          name="Pastel de Carne"
+          price="R$ 2,00"
+          size="Grande"
+          IconComponent={pastel}
+          on:addToCart={() =>
+            addToCart({
+              name: "Pastel de Carne",
+              price: "R$ 2,00",
+              size: "pequeno",
+            })}
+        />
+        <Card
+          name="Pastel de Frango"
+          price="R$ 2,00"
+          size="Grande"
+          IconComponent={pastel}
+          on:addToCart={() =>
+            addToCart({
+              name: "Pastel de Frango",
+              price: "R$ 2,00",
+              size: "pequeno",
+            })}
+        />
+        <Card
+          name="Misto"
+          price="R$ 2,00"
+          size="Grande"
+          IconComponent={pastel}
+          on:addToCart={() =>
+            addToCart({ name: "Misto", price: "R$ 2,00", size: "pequeno" })}
+        />
+      </Row>
+    </Column>
+    <div class="column">
+      <SelectedItems items={selectedItems} {removeItem} />
+      <button class="save-file" on:click={generateImage}>
+        Salvar Pedido
+      </button>
+    </div>
   </Row>
-  <br />
-  <button class="save-file" on:click={generateImage}> Salvar Pedido </button>
-
-  <SelectedItems items={selectedItems} {removeItem} />
 </main>
 
 <style>
@@ -132,6 +141,13 @@
     padding: 1em;
 
     margin: 0 auto;
+  }
+  .column {
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
   }
 
   .save-file {
