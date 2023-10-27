@@ -33,24 +33,6 @@
       selectedItems = selectedItems.filter((item) => item !== itemToRemove);
     }
   }
-  import html2canvas from "html2canvas";
-
-  async function generateImage() {
-    const selectedItemsElement = document.querySelector(
-      ".selected-items"
-    ) as HTMLElement;
-
-    if (selectedItemsElement) {
-      const canvas = await html2canvas(selectedItemsElement);
-      const imgURL = canvas.toDataURL("image/png");
-
-      // Criar um link para baixar a imagem
-      let link = document.createElement("a");
-      link.download = "listaPedidos.png";
-      link.href = imgURL;
-      link.click();
-    }
-  }
 </script>
 
 <svelte:head>
@@ -77,7 +59,7 @@
           size="Médio"
           IconComponent={waterMedium}
           on:addToCart={() =>
-            addToCart({ name: "Açaí M", price: "R$ 4,00", size: "pequeno" })}
+            addToCart({ name: "Açaí M", price: "R$ 4,00", size: "Médio" })}
         />
         <Card
           name="Açaí G"
@@ -85,49 +67,46 @@
           size="Grande"
           IconComponent={waterFull}
           on:addToCart={() =>
-            addToCart({ name: "Açaí G", price: "R$ 5,00", size: "pequeno" })}
+            addToCart({ name: "Açaí G", price: "R$ 5,00", size: "Grande" })}
         />
       </Row>
       <Row>
         <Card
           name="Pastel de Carne"
           price="R$ 2,00"
-          size="Grande"
+          size="Normal"
           IconComponent={pastel}
           on:addToCart={() =>
             addToCart({
               name: "Pastel de Carne",
               price: "R$ 2,00",
-              size: "pequeno",
+              size: "Normal",
             })}
         />
         <Card
           name="Pastel de Frango"
           price="R$ 2,00"
-          size="Grande"
+          size="Normal"
           IconComponent={pastel}
           on:addToCart={() =>
             addToCart({
               name: "Pastel de Frango",
               price: "R$ 2,00",
-              size: "pequeno",
+              size: "Normal",
             })}
         />
         <Card
           name="Misto"
           price="R$ 2,00"
-          size="Grande"
+          size="Normal"
           IconComponent={pastel}
           on:addToCart={() =>
-            addToCart({ name: "Misto", price: "R$ 2,00", size: "pequeno" })}
+            addToCart({ name: "Misto", price: "R$ 2,00", size: "Normal" })}
         />
       </Row>
     </Column>
     <div class="column">
       <SelectedItems items={selectedItems} {removeItem} />
-      <button class="save-file" on:click={generateImage}>
-        Salvar Pedido
-      </button>
     </div>
   </Row>
 </main>
@@ -135,6 +114,11 @@
 <style>
   :global(body) {
     font-family: "Inter";
+    margin: 0;
+    padding: 0;
+  }
+  :global(input, button, select, textarea) {
+    margin: 0;
   }
   main {
     text-align: center;
@@ -143,30 +127,12 @@
     align-items: center;
     justify-content: center;
   }
+
   .column {
     gap: 8px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     /* width: 100%; */
-  }
-
-  .save-file {
-    background-color: #4f44e0;
-    color: white;
-    padding: 8px;
-    display: flex;
-    font-size: 14px;
-    font-weight: 500;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
-  }
-
-  .save-file:hover {
-    background-color: #352da3;
   }
 </style>

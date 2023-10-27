@@ -15,9 +15,9 @@
 </script>
 
 <div class="card">
-  <button class="icon">
+  <div class="icon">
     <svelte:component this={IconComponent} />
-  </button>
+  </div>
   <div class="wrapper">
     <div class="details">
       <div class="details-name">{name}</div>
@@ -88,7 +88,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 6px;
   }
 
   .button {
