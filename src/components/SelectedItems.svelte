@@ -1,61 +1,12 @@
-<!-- SelectedItems.svelte -->
 <script lang="ts">
-  import PixIcon from "./icons/pix-icon.svelte";
   import Row from "./row.svelte";
   import Modal from "../components/Modal.svelte";
   export let items = [];
   export let removeItem;
   let isModalVisible;
 
-  let pixKey = "";
-
-  const messageText = `Olá! Aqui está a lista de pedidos atualizada para sua revisão. Por favor, verifique os itens listados e confirme se tudo está correto. Obrigado!`;
-
-  async function shareToSlack(dataUrl) {
-    const token = "xoxb-573526686480-6096992548550-DhDJznqh4UFMHsRKZLnKzTu0";
-    const channel = "CGY7TC8F7";
-
-    const blob = await (await fetch(dataUrl)).blob();
-
-    const formData = new FormData();
-    formData.append("token", token);
-    formData.append("channels", channel);
-    formData.append("file", blob);
-
-    fetch("https://slack.com/api/files.upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then(async (data) => {
-        if (!data.ok) {
-          throw new Error(data.error);
-        }
-        const payload = {
-          channel: channel,
-          text: messageText,
-          token: token,
-        };
-
-        const response = await fetch("https://slack.com/api/chat.postMessage", {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const jsonData = await response.json();
-
-        if (!jsonData.ok) {
-          throw new Error(jsonData.error);
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao comunicar com o Slack:", error);
-      });
-  }
+  let responsavel = "";
+  let chavePix = "";
 
   import html2canvas from "html2canvas";
 
@@ -71,12 +22,7 @@
     return `${year}${month}${day}_${hours}${minutes}${seconds}`;
   }
 
-  async function generateImage(shareToSlackFlag = false) {
-    if (items.length === 0) {
-      isModalVisible = true;
-      return;
-    }
-
+  async function generateImage() {
     const selectedItemsElement = document.querySelector(
       ".selected-items"
     ) as HTMLElement;
@@ -84,26 +30,91 @@
       const canvas = await html2canvas(selectedItemsElement);
       const imgURL = canvas.toDataURL("image/png");
 
-      if (shareToSlackFlag) {
-        shareToSlack(imgURL);
-      } else {
-        let link = document.createElement("a");
-        link.download = `listaPedidos_${getFormattedDate()}.png`;
-        link.href = imgURL;
-        link.click();
-      }
+      let link = document.createElement("a");
+      link.download = `listaPedidos_${getFormattedDate()}.png`;
+      link.href = imgURL;
+      link.click();
     }
   }
 
+  import { jsPDF } from "jspdf";
+
+  function generatePDFReport() {
+    if (items.length === 0) {
+      isModalVisible = true;
+      return;
+    }
+    const doc = new jsPDF();
+
+    doc.setFillColor(220, 20, 60); // Vermelho
+    doc.rect(0, 0, 220, 30, "F");
+    doc.setTextColor(255, 255, 255); // Branco
+    doc.setFontSize(18);
+    doc.text("Lista de Pedidos", 105, 20, { align: "center" });
+
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0); // Preto
+    doc.text(`Responsável: ${responsavel}`, 20, 40);
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0); // Preto
+
+    let yPos = 60;
+
+    doc.setFontSize(12);
+    doc.text(`Pix: ${chavePix}`, 20, 50);
+    yPos += 10;
+
+    items.forEach((item, index) => {
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0); // Preto
+      const itemText = `${item.name} - ${item.size} - ${item.count} x ${item.price}`;
+      doc.text(itemText, 20, yPos);
+      yPos += 10;
+
+      if (item.details) {
+        item.details.forEach((detail) => {
+          doc.setFontSize(10);
+          const solicitante = `${detail.solicitante}`;
+          doc.text(solicitante, 30, yPos);
+          yPos += 8;
+
+          if (detail.observacao && detail.observacao.trim() !== "") {
+            const observacao = `Observação: ${detail.observacao}`;
+            doc.text(observacao, 30, yPos);
+            yPos += 10;
+          }
+        });
+      }
+
+      // Linha de Separação
+      doc.setDrawColor(220, 220, 220); // Cinza claro
+      doc.line(20, yPos, 190, yPos);
+      yPos += 5;
+    });
+
+    // Totais
+    yPos += 10;
+    doc.setFontSize(14);
+    const totalCountText = `Total de itens: ${totalCount}`;
+    const totalValueText = `Valor total: R$ ${totalValue.toFixed(2)}`;
+    doc.text(totalCountText, 20, yPos);
+    yPos += 10;
+    doc.text(totalValueText, 20, yPos);
+
+    // Rodapé Estilizado
+
+    doc.save(`listaPedidos_${getFormattedDate()}.pdf`);
+  }
+
   const solicitantes = [
-    "Eliezer Castro",
-    "João Tavares",
-    "Thiago Paiva",
     "Aelmo Lustosa",
     "Augusto Batista",
+    "Eliezer Castro",
     "Gabriel Silva",
     "Jayrson Parana",
+    "João Tavares",
     "Sheldon Pereira",
+    "Thiago Paiva",
     "Valdisnei Nilo",
   ];
   $: totalValue = items.reduce(
@@ -137,6 +148,12 @@
   {#if items.length === 0}
     <div class="empty-message">Por favor, adicione um produto.</div>
   {:else}
+    <input
+      class="responsavel"
+      bind:value={responsavel}
+      placeholder="Resposável"
+    />
+
     <div class="pix-input">
       <select id="tipo-pix">
         <option value=""> Chave Pix</option>
@@ -144,7 +161,12 @@
         <option value="Telefone">Telefone</option>
         <option value="E-mail">E-mail</option>
       </select>
-      <input type="text" id="chave-pix" placeholder="Digite a chave PIX" />
+      <input
+        type="text"
+        id="chave-pix"
+        bind:value={chavePix}
+        placeholder="Digite a chave PIX"
+      />
     </div>
     {#each items as item (item.name)}
       <div class="item">
@@ -193,11 +215,11 @@
   {/if}
 </div>
 <Row>
-  <button class="save-file" on:click={() => generateImage(false)}>
+  <button class="save-file" on:click={() => generateImage()}>
     Salvar Pedido
   </button>
-  <button class="shared-slack" on:click={() => generateImage(true)}>
-    Compartilhar no Slack
+  <button class="pdf-generate" on:click={() => generatePDFReport()}>
+    Gerar PDF
   </button>
 </Row>
 
@@ -297,7 +319,13 @@
   input {
     width: 70%;
   }
-  .save-file {
+  .responsavel {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+  .save-file,
+  .pdf-generate {
     background-color: #4f44e0;
     color: white;
     padding: 8px;
@@ -311,26 +339,11 @@
     border: none;
     transition: background-color 0.3s;
   }
-
-  .shared-slack {
-    background-color: #4a154b;
-    color: white;
-    padding: 8px;
-    display: flex;
-    font-size: 14px;
-    font-weight: 500;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
+  .pdf-generate {
+    background-color: #595959;
   }
 
   .save-file:hover {
     background-color: #352da3;
-  }
-  .shared-slack:hover {
-    background-color: #390f3a;
   }
 </style>

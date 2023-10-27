@@ -1,11 +1,10 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
-
   "include": ["src/**/*"],
   "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
   "compilerOptions": {
     "allowJs": true,
-    "esModuleInterop": true
-    // outras configurações...
+    "esModuleInterop": true,
+    "ignoreDeprecations": "5.0"
   }
 }
