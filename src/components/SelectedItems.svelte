@@ -12,7 +12,7 @@
   const messageText = `Olá! Aqui está a lista de pedidos atualizada para sua revisão. Por favor, verifique os itens listados e confirme se tudo está correto. Obrigado!`;
 
   async function shareToSlack(dataUrl) {
-    const token = "xoxb-573526686480-6096992548550-ZMpZ3av0AibxH7XuvffwvJdQ";
+    const token = "xoxb-573526686480-6096992548550-DhDJznqh4UFMHsRKZLnKzTu0";
     const channel = "CGY7TC8F7";
 
     const blob = await (await fetch(dataUrl)).blob();
