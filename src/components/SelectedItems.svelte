@@ -1,115 +1,18 @@
 <script lang="ts">
-  import Row from "./row.svelte";
   import Modal from "../components/Modal.svelte";
   export let items = [];
   export let removeItem;
   let isModalVisible;
 
-  let responsavel = "";
-  let chavePix = "";
-
-  import html2canvas from "html2canvas";
-
-  function getFormattedDate(): string {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
-  }
-
-  async function generateImage() {
-    const selectedItemsElement = document.querySelector(
-      ".selected-items"
-    ) as HTMLElement;
-    if (selectedItemsElement) {
-      const canvas = await html2canvas(selectedItemsElement);
-      const imgURL = canvas.toDataURL("image/png");
-
-      let link = document.createElement("a");
-      link.download = `listaPedidos_${getFormattedDate()}.png`;
-      link.href = imgURL;
-      link.click();
-    }
-  }
-
-  import { jsPDF } from "jspdf";
-
-  function generatePDFReport() {
-    if (items.length === 0) {
-      isModalVisible = true;
-      return;
-    }
-    const doc = new jsPDF();
-
-    doc.setFillColor(220, 20, 60); // Vermelho
-    doc.rect(0, 0, 220, 30, "F");
-    doc.setTextColor(255, 255, 255); // Branco
-    doc.setFontSize(18);
-    doc.text("Lista de Pedidos", 105, 20, { align: "center" });
-
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0); // Preto
-    doc.text(`Responsável: ${responsavel}`, 20, 40);
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0); // Preto
-
-    let yPos = 60;
-
-    doc.setFontSize(12);
-    doc.text(`Pix: ${chavePix}`, 20, 50);
-    yPos += 10;
-
-    items.forEach((item, index) => {
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0); // Preto
-      const itemText = `${item.name} - ${item.size} - ${item.count} x ${item.price}`;
-      doc.text(itemText, 20, yPos);
-      yPos += 10;
-
-      if (item.details) {
-        item.details.forEach((detail) => {
-          doc.setFontSize(10);
-          const solicitante = `${detail.solicitante}`;
-          doc.text(solicitante, 30, yPos);
-          yPos += 8;
-
-          if (detail.observacao && detail.observacao.trim() !== "") {
-            const observacao = `Observação: ${detail.observacao}`;
-            doc.text(observacao, 30, yPos);
-            yPos += 10;
-          }
-        });
-      }
-
-      // Linha de Separação
-      doc.setDrawColor(220, 220, 220); // Cinza claro
-      doc.line(20, yPos, 190, yPos);
-      yPos += 5;
-    });
-
-    // Totais
-    yPos += 10;
-    doc.setFontSize(14);
-    const totalCountText = `Total de itens: ${totalCount}`;
-    const totalValueText = `Valor total: R$ ${totalValue.toFixed(2)}`;
-    doc.text(totalCountText, 20, yPos);
-    yPos += 10;
-    doc.text(totalValueText, 20, yPos);
-
-    // Rodapé Estilizado
-
-    doc.save(`listaPedidos_${getFormattedDate()}.pdf`);
-  }
+  export let responsavel = "";
+  export let chavePix = "";
 
   const solicitantes = [
     "Aelmo Lustosa",
     "Augusto Batista",
+    "Eduardo Vinhal",
     "Eliezer Castro",
+    "Ézio Gomes",
     "Gabriel Silva",
     "Jayrson Parana",
     "João Tavares",
@@ -188,7 +91,9 @@
         {#each Array(item.count).fill(0) as _, index}
           <div class="detail-input">
             <select
-              value={(item.details && item.details[index].solicitante) || ""}
+              value={item.details && item.details[index]
+                ? item.details[index].solicitante
+                : ""}
               on:change={(e) =>
                 handleDetailChange(e, item, index, "solicitante")}
             >
@@ -200,7 +105,9 @@
             <input
               type="text"
               placeholder="Observação"
-              value={(item.details && item.details[index].observacao) || ""}
+              value={item.details && item.details[index]
+                ? item.details[index].observacao
+                : ""}
               on:input={(e) => handleDetailChange(e, item, index, "observacao")}
             />
           </div>
@@ -214,14 +121,6 @@
     </div>
   {/if}
 </div>
-<Row>
-  <button class="save-file" on:click={() => generateImage()}>
-    Salvar Pedido
-  </button>
-  <button class="pdf-generate" on:click={() => generatePDFReport()}>
-    Gerar PDF
-  </button>
-</Row>
 
 <style>
   .selected-items {
@@ -323,27 +222,5 @@
     width: 100%;
     margin-top: 12px;
     margin-bottom: 12px;
-  }
-  .save-file,
-  .pdf-generate {
-    background-color: #4f44e0;
-    color: white;
-    padding: 8px;
-    display: flex;
-    font-size: 14px;
-    font-weight: 500;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
-  }
-  .pdf-generate {
-    background-color: #595959;
-  }
-
-  .save-file:hover {
-    background-color: #352da3;
   }
 </style>

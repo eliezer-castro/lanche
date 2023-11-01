@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import html2canvas from "html2canvas";
   import Card from "./components/product-card.svelte";
   import Row from "./components/row.svelte";
   import Column from "./components/Column.svelte";
@@ -7,8 +9,47 @@
   import waterLoss from "./components/icons/water-loss-icon.svelte";
   import waterFull from "./components/icons/water-full-icon.svelte";
   import pastel from "./components/icons/pastel-icon.svelte";
+  import Ticket from "./components/ticket.svelte";
+
+  let ticketElement;
+
+  onMount(() => {
+    ticketElement.style.display = "none";
+  });
+
+  function getFormattedDate(): string {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+  }
 
   let selectedItems = [];
+
+  async function generateImage() {
+    const selectedItemsElement = document.querySelector(
+      ".selected-items"
+    ) as HTMLElement;
+    if (selectedItemsElement) {
+      // selectedItemsElement.style.display = "block";
+      const canvas = await html2canvas(selectedItemsElement);
+      // selectedItemsElement.style.display = "none";
+      const imgURL = canvas.toDataURL("image/png");
+
+      let link = document.createElement("a");
+      link.download = `listaPedidos_${getFormattedDate()}.png`;
+      link.href = imgURL;
+      link.click();
+    }
+  }
+
+  let responsavel = "";
+  let chavePix = "";
 
   function addToCart(item) {
     const existingItem = selectedItems.find((i) => i.name === item.name);
@@ -106,7 +147,17 @@
       </Row>
     </Column>
     <div class="column">
-      <SelectedItems items={selectedItems} {removeItem} />
+      <SelectedItems
+        items={selectedItems}
+        {removeItem}
+        bind:responsavel
+        bind:chavePix
+      />
+      <Row>
+        <button class="save-file" on:click={() => generateImage()}>
+          Salvar Pedido
+        </button>
+      </Row>
     </div>
   </Row>
 </main>
@@ -127,12 +178,29 @@
     align-items: center;
     justify-content: center;
   }
+  .save-file {
+    background-color: #4f44e0;
+    color: white;
+    padding: 8px;
+    display: flex;
+    font-size: 14px;
+    font-weight: 500;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+  }
+
+  .save-file:hover {
+    background-color: #352da3;
+  }
 
   .column {
     gap: 8px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    /* width: 100%; */
   }
 </style>
