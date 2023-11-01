@@ -97,7 +97,7 @@
               on:change={(e) =>
                 handleDetailChange(e, item, index, "solicitante")}
             >
-              <option value="">Solicitante</option>
+              <option value="">-</option>
               {#each solicitantes as solicitante}
                 <option value={solicitante}>{solicitante}</option>
               {/each}
