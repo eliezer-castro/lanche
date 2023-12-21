@@ -9,7 +9,7 @@
 
   const solicitantes = [
     "Aelmo Lustosa",
-    "Augusto Batista",
+    "Raimones Barros",
     "Eduardo Vinhal",
     "Eliezer Castro",
     "Ézio Gomes",
